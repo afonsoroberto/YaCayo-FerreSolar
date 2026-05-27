@@ -95,7 +95,7 @@ export function useValidation(onSuccess?: (result: ValidationResult) => void) {
       fechaPago:       form.date,
       importe:         amountFmt,
       bancoOrigen:     form.bankCode,
-      reqCed:          form.bankCode === '0102' ? form.reqCed : false,
+      reqCed: false,
     }
 
     try {

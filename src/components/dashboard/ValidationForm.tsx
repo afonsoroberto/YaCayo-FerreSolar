@@ -204,40 +204,6 @@ export default function ValidationForm({ onSuccess }: Props) {
           {errors.cedula && <span style={errorText}>{errors.cedula}</span>}
         </div>
 
-        {/* reqCed */}
-        <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <label style={{
-            display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
-            padding: '8px 12px', borderRadius: 10,
-            background: form.reqCed ? 'rgba(244,183,49,0.08)' : 'rgba(24,20,15,0.02)',
-            border: `1px solid ${form.reqCed ? 'rgba(244,183,49,0.22)' : 'rgba(24,20,15,0.07)'}`,
-            flex: 1, transition: 'all 0.15s',
-          }}>
-            <input
-              type="checkbox"
-              checked={form.reqCed}
-              onChange={e => setField('reqCed', e.target.checked)}
-              style={{ accentColor: '#E97A1F', width: 15, height: 15, cursor: 'pointer' }}
-            />
-            <div style={{ lineHeight: 1.3 }}>
-              <span style={{ fontSize: 12.5, fontWeight: 500, color: '#18140F' }}>Validar cédula del pagador (reqCed)</span>
-              <span style={{ display: 'block', fontSize: 10.5, color: '#6A6357', fontFamily: "'Geist Mono', monospace" }}>
-                {form.bankCode === '0102'
-                  ? 'Operación BDV–BDV · habilitado por defecto'
-                  : 'Solo aplica en operaciones BDV–BDV'}
-              </span>
-            </div>
-            {form.bankCode === '0102' && (
-              <span style={{
-                marginLeft: 'auto', fontSize: 9.5, fontFamily: "'Geist Mono', monospace",
-                color: '#8a601a', background: 'rgba(224,160,44,0.14)',
-                padding: '2px 7px', borderRadius: 999, border: '1px solid rgba(224,160,44,0.22)',
-                letterSpacing: '0.06em', textTransform: 'uppercase',
-              }}>BDV–BDV</span>
-            )}
-          </label>
-        </div>
-
       </div>
 
       {/* Footer */}
