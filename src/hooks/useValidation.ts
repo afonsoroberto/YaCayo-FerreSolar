@@ -39,11 +39,17 @@ export function useValidation(onSuccess?: (result: ValidationResult) => void) {
 
   const validate = useCallback((): ValidationFormErrors => {
     const errs: ValidationFormErrors = {}
-    if (!form.ref.trim())    errs.ref    = 'Requerido'
+    if (!form.ref.trim()) {
+      errs.ref = 'Requerido'
+    } else if (form.ref.trim().length < 4) {
+      errs.ref = 'Mínimo 4 dígitos'
+    } else if (form.ref.trim().length > 8) {
+      errs.ref = 'Máximo 8 dígitos'
+    }
     if (!form.amount.trim()) errs.amount = 'Requerido'
     if (!form.date.trim())   errs.date   = 'Requerido'
     if (!form.cedula.trim()) errs.cedula = 'Requerido'
-    if (!form.phone.trim())  errs.phone  = 'Requerido'
+    // Teléfono es opcional — no se valida como requerido
 
     const bankCfg = getBankByCode(form.bankCode)
     if (!bankCfg?.telefonoDestino) {

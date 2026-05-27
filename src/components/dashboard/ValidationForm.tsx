@@ -121,12 +121,16 @@ export default function ValidationForm({ onSuccess }: Props) {
             <input
               type="text"
               value={form.ref}
-              onChange={e => setField('ref', e.target.value)}
-              placeholder="12345678"
+              onChange={e => setField('ref', e.target.value.replace(/\D/g, '').slice(0, 8))}
+              placeholder="Últimos 4-8 dígitos"
+              maxLength={8}
               style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Geist Mono', monospace", fontSize: 13, color: '#18140F' }}
             />
             {form.ref && <IconCheck size={16} />}
           </div>
+          <span style={{ fontSize: 10.5, color: '#9A9285', fontFamily: "'Geist Mono', monospace" }}>
+            Puedes ingresar solo los últimos 4 dígitos
+          </span>
           {errors.ref && <span style={errorText}>{errors.ref}</span>}
         </div>
 
@@ -163,7 +167,10 @@ export default function ValidationForm({ onSuccess }: Props) {
 
         {/* Phone — opcional */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <label style={labelStyle}>Teléfono pagador</label>
+          <label style={labelStyle}>
+            Teléfono pagador
+            <span style={{ marginLeft: 6, fontSize: 9.5, color: '#9A9285', fontWeight: 400, letterSpacing: '0.02em', textTransform: 'none' }}>opcional</span>
+          </label>
           <div style={form.phone ? inputFilled : inputBase}>
             <span style={{ fontFamily: "'Geist Mono', monospace", color: '#6A6357', fontSize: 12, flexShrink: 0 }}>+58</span>
             <input
