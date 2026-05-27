@@ -223,12 +223,13 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
   return (
     <>
       <div style={{
-        height: 64, padding: '0 28px',
-        display: 'flex', alignItems: 'center', gap: 16,
+        height: 56, padding: '0 16px',
+        display: 'flex', alignItems: 'center', gap: 10,
         borderBottom: '1px solid rgba(24,20,15,0.09)',
         background: 'rgba(251,247,238,0.92)',
         backdropFilter: 'blur(8px)',
         flexShrink: 0,
+        overflow: 'hidden',
       }}>
         {/* Hamburger — mobile only */}
         {onMenuClick && (
@@ -263,7 +264,7 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
         </div>
 
         {/* Search */}
-        <div ref={wrapRef} style={{ marginLeft: 24, flex: 1, maxWidth: 420, position: 'relative' }}>
+        <div ref={wrapRef} style={{ marginLeft: onMenuClick ? 0 : 16, flex: 1, maxWidth: onMenuClick ? '100%' : 420, position: 'relative' }}>
           <div style={{
             height: 36, borderRadius: 10,
             background: showDropdown ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.55)',
@@ -351,19 +352,21 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
 
         <div style={{ flex: 1 }} />
 
-        {/* Live clock pill */}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 7,
-          padding: '5px 11px 5px 9px', borderRadius: 999, fontSize: 12,
-          border: '1px solid rgba(24,20,15,0.09)',
-          background: 'rgba(255,255,255,0.55)', color: '#2A241E', whiteSpace: 'nowrap',
-        }}>
-          <span className="dot-pulse-orange" style={{
-            width: 7, height: 7, borderRadius: '50%', background: '#E97A1F',
-            display: 'inline-block', flexShrink: 0,
-          }}/>
-          Día operativo · <b style={{ color: '#18140F', fontWeight: 500, marginLeft: 2 }}>{formatClock(now)}</b>
-        </div>
+        {/* Live clock pill — hidden on mobile */}
+        {!onMenuClick && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            padding: '5px 11px 5px 9px', borderRadius: 999, fontSize: 12,
+            border: '1px solid rgba(24,20,15,0.09)',
+            background: 'rgba(255,255,255,0.55)', color: '#2A241E', whiteSpace: 'nowrap',
+          }}>
+            <span className="dot-pulse-orange" style={{
+              width: 7, height: 7, borderRadius: '50%', background: '#E97A1F',
+              display: 'inline-block', flexShrink: 0,
+            }}/>
+            Día operativo · <b style={{ color: '#18140F', fontWeight: 500, marginLeft: 2 }}>{formatClock(now)}</b>
+          </div>
+        )}
       </div>
 
       {selected && <PaymentDetailModal payment={selected} onClose={() => setSelected(null)} />}

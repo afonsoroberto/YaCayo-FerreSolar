@@ -1,5 +1,6 @@
 import type { ValidationResult } from '../../types'
 import { useValidation } from '../../hooks/useValidation'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { getBankConfigs } from '../../config/banks'
 import {
   IconCheckShield, IconArrowDown, IconCheck,
@@ -41,6 +42,7 @@ const errorText: React.CSSProperties = {
 
 export default function ValidationForm({ onSuccess }: Props) {
   const { form, setField, errors, submitting, submit, reset } = useValidation(onSuccess)
+  const isMobile = useIsMobile()
   const banks = getBankConfigs().filter(b => b.active)
   const selectedBank = banks.find(b => b.code === form.bankCode) ?? banks[0]
 
@@ -88,7 +90,7 @@ export default function ValidationForm({ onSuccess }: Props) {
       </div>
 
       {/* Fields */}
-      <div style={{ padding: '16px 20px 4px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 14px' }}>
+      <div style={{ padding: '16px 20px 4px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '12px 14px' }}>
 
         {/* Bank selector */}
         <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 5 }}>
