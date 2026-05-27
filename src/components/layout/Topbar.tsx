@@ -223,13 +223,15 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
   return (
     <>
       <div style={{
-        height: 56, padding: '0 16px',
-        display: 'flex', alignItems: 'center', gap: 10,
+        height: 56, padding: '0 12px',
+        display: 'flex', alignItems: 'center', gap: 8,
         borderBottom: '1px solid rgba(24,20,15,0.09)',
         background: 'rgba(251,247,238,0.92)',
         backdropFilter: 'blur(8px)',
         flexShrink: 0,
         overflow: 'hidden',
+        width: '100%',
+        boxSizing: 'border-box',
       }}>
         {/* Hamburger — mobile only */}
         {onMenuClick && (
@@ -292,7 +294,9 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
                 <IconX size={14} />
               </button>
             ) : (
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10.5, color: '#6A6357', border: '1px solid rgba(24,20,15,0.09)', padding: '1px 5px', borderRadius: 4, background: '#FBF7EE', whiteSpace: 'nowrap' }}>⌘K</span>
+              !onMenuClick && (
+                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10.5, color: '#6A6357', border: '1px solid rgba(24,20,15,0.09)', padding: '1px 5px', borderRadius: 4, background: '#FBF7EE', whiteSpace: 'nowrap' }}>⌘K</span>
+              )
             )}
           </div>
 

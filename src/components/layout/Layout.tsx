@@ -58,6 +58,8 @@ export default function Layout() {
       <div style={{
         flex: 1,
         minWidth: 0,
+        maxWidth: '100%',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
