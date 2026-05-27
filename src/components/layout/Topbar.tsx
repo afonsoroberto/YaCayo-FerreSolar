@@ -274,7 +274,7 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
             background: showDropdown ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.55)',
             border: showDropdown ? '1px solid rgba(217,64,42,0.35)' : '1px solid rgba(24,20,15,0.09)',
             boxShadow: showDropdown ? '0 0 0 3px rgba(217,64,42,0.08)' : 'none',
-            display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px 0 12px',
+            display: 'flex', alignItems: 'center', gap: 6, padding: '0 8px',
             transition: 'border-color 0.15s, box-shadow 0.15s',
           }}>
             <IconSearch size={16} />
