@@ -1,0 +1,1819 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>YaCayó — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:      #ECE5D6;
+    --cream-2:    #F2ECDD;
+    --cream-3:    #E4DCC8;
+    --paper:      #FBF7EE;
+    --ink:        #18140F;
+    --ink-2:      #2A241E;
+    --mute:       #6A6357;
+    --mute-2:     #9A9285;
+    --line:       rgba(24,20,15,0.09);
+    --line-2:     rgba(24,20,15,0.05);
+    --ember-1:    #D9402A;
+    --ember-2:    #E97A1F;
+    --ember-3:    #F4B731;
+    --ember:      linear-gradient(135deg,#D9402A 0%, #E97A1F 52%, #F4B731 100%);
+    --ember-soft: linear-gradient(135deg,rgba(217,64,42,0.16) 0%, rgba(233,122,31,0.14) 50%, rgba(244,183,49,0.12) 100%);
+    --graphite-0: #0F0D0B;
+    --graphite-1: #15120F;
+    --graphite-2: #1C1814;
+    --graphite-3: #25201B;
+    --graphite-4: #322B25;
+    --good:       #4F9D6B;
+    --warn:       #E0A02C;
+    --bad:        #C8453A;
+    --radius-sm:  10px;
+    --radius:     16px;
+    --radius-lg:  22px;
+    --radius-xl:  28px;
+    --shadow-sm:  0 1px 0 rgba(24,20,15,0.04), 0 1px 2px rgba(24,20,15,0.04);
+    --shadow:     0 1px 0 rgba(24,20,15,0.04), 0 6px 18px -8px rgba(24,20,15,0.10), 0 24px 48px -24px rgba(24,20,15,0.10);
+    --shadow-lg:  0 1px 0 rgba(24,20,15,0.04), 0 18px 40px -16px rgba(24,20,15,0.18), 0 60px 100px -40px rgba(24,20,15,0.20);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 700px at 12% -10%, rgba(244,183,49,0.10), transparent 60%),
+      radial-gradient(1100px 700px at 95% 18%, rgba(217,64,42,0.05), transparent 65%),
+      var(--cream);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    font-feature-settings: 'ss01','cv11','tnum';
+  }
+  .mono { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-feature-settings:'tnum'; }
+  .num  { font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  /* ── presentation canvas ───────────────────────────── */
+  .canvas {
+    width: 2080px;
+    padding: 72px 64px 96px;
+    display: grid;
+    grid-template-columns: 1440px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 56px;
+    row-gap: 64px;
+    align-items: start;
+  }
+  .canvas-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 4px 4px;
+  }
+  .canvas-head h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .canvas-head h1 .tag { color: var(--mute); font-weight: 400; }
+  .canvas-head .meta {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mute);
+    display: flex; gap: 18px; align-items: center;
+  }
+  .canvas-head .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ember-2); display:inline-block; }
+
+  /* ── desktop artboard ─────────────────────────────── */
+  .artboard {
+    width: 1440px;
+    border-radius: var(--radius-xl);
+    background: var(--cream);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+  }
+  .artboard::before {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(720px 360px at 18% 0%, rgba(244,183,49,0.10), transparent 60%),
+      radial-gradient(540px 360px at 90% 6%, rgba(217,64,42,0.06), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .artboard > * { position: relative; z-index: 1; }
+
+  .app {
+    display: grid;
+    grid-template-columns: 256px 1fr;
+    min-height: 1820px;
+  }
+
+  /* ── sidebar ──────────────────────────────────────── */
+  .sidebar {
+    background: linear-gradient(180deg, var(--graphite-2) 0%, var(--graphite-1) 100%);
+    color: #E9E3D5;
+    padding: 22px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+  }
+  .sidebar::after {
+    content: "";
+    position: absolute; right: 0; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(244,183,49,0.18), transparent);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 10px 2px;
+  }
+  .brand-mark {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--ember);
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 4px 10px -2px rgba(217,64,42,0.45);
+  }
+  .brand-mark::before {
+    content: ""; position: absolute; inset: 5px;
+    border: 1.5px solid rgba(255,255,255,0.85); border-right: none; border-bottom: none;
+    border-radius: 3px 0 0 0;
+  }
+  .brand-mark::after {
+    content: ""; position: absolute; inset: 5px;
+    border: 1.5px solid rgba(24,20,15,0.55); border-left: none; border-top: none;
+    border-radius: 0 0 3px 0;
+  }
+  .brand-word {
+    font-size: 17px; font-weight: 600; letter-spacing: 0.02em; color: #F4EEDF;
+  }
+  .brand-word .dim { color: #8a8378; font-weight: 400; margin-left: 6px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+
+  .workspace {
+    margin-top: 4px;
+    position: relative;
+    border-radius: 14px;
+    padding: 14px 14px 13px;
+    background:
+      linear-gradient(180deg, rgba(244,183,49,0.10), rgba(217,64,42,0.04) 60%, transparent 100%),
+      var(--graphite-3);
+    border: 1px solid rgba(244,183,49,0.16);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 11px;
+    cursor: pointer;
+  }
+  .workspace .ws-logo {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.06);
+    flex: none;
+  }
+  .ws-logo svg { display:block; }
+  .workspace .ws-name {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .workspace .ws-name .top { display: flex; align-items: center; gap: 6px; }
+  .workspace .ws-name b { font-size: 13.5px; font-weight: 600; color: #F4EEDF; letter-spacing: 0.005em; }
+  .workspace .ws-name .badge {
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ember-3);
+    background: rgba(244,183,49,0.12);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(244,183,49,0.18);
+  }
+  .workspace .ws-name .sub { font-size: 11px; color: #9C9385; display: flex; align-items: center; gap: 5px; }
+  .workspace .ws-name .sub .live { width: 5px; height: 5px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 2px rgba(79,157,107,0.20); }
+  .workspace .swap { color: #6c655a; }
+  .workspace .swap:hover { color: #c0b9a8; }
+
+  .nav-section {
+    margin-top: 6px;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .nav-section .label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6c655a; padding: 4px 12px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 8px 12px;
+    border-radius: 9px;
+    color: #B6AE9F;
+    font-size: 13.5px;
+    cursor: pointer;
+    position: relative;
+  }
+  .nav-item:hover { color: #ECE5D6; background: rgba(255,255,255,0.03); }
+  .nav-item.active {
+    background: rgba(255,255,255,0.05);
+    color: #F4EEDF;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .nav-item.active::before {
+    content:""; position: absolute; left: -16px; top: 7px; bottom: 7px; width: 2px;
+    background: var(--ember);
+    border-radius: 0 2px 2px 0;
+  }
+  .nav-item .ico { width: 16px; height: 16px; flex: none; opacity: 0.85; }
+  .nav-item .count {
+    margin-left: auto;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(244,183,49,0.12);
+    color: var(--ember-3);
+    border: 1px solid rgba(244,183,49,0.18);
+  }
+  .nav-item .kbd {
+    margin-left: auto;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    color: #6c655a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .sidebar-foot {
+    margin-top: auto;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .opday {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 11px 12px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .opday .row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #B6AE9F; }
+  .opday .row b { color: #F4EEDF; font-weight: 500; }
+  .opday .bar { height: 4px; border-radius: 999px; background: rgba(255,255,255,0.06); overflow: hidden; position: relative; }
+  .opday .bar > i { display:block; height:100%; width: 62%; background: var(--ember); border-radius: inherit; }
+  .opday .meta { display:flex; justify-content: space-between; font-family:'Geist Mono', monospace; font-size: 10px; color: #6c655a; letter-spacing: 0.04em; }
+
+  /* ── main column ──────────────────────────────────── */
+  .main { padding: 0 0 56px; min-width: 0; }
+
+  .topbar {
+    height: 64px;
+    padding: 0 28px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+  }
+  .crumbs { display:flex; align-items:center; gap: 8px; font-size: 13px; color: var(--mute); }
+  .crumbs b { color: var(--ink); font-weight: 500; }
+  .crumbs .sep { color: var(--mute-2); }
+  .search {
+    margin-left: 24px;
+    flex: 1; max-width: 420px;
+    height: 36px; border-radius: 10px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 10px 0 12px;
+    color: var(--mute);
+    font-size: 13px;
+  }
+  .search .kbd { margin-left: auto; font-family:'Geist Mono', monospace; font-size: 10.5px; color: var(--mute); border:1px solid var(--line); padding: 1px 5px; border-radius: 4px; background: var(--paper); }
+  .topbar .spacer { flex: 1; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.55);
+    color: var(--ink-2);
+  }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px rgba(79,157,107,0.15); }
+  .pill.warm .dot { background: var(--ember-2); box-shadow: 0 0 0 3px rgba(233,122,31,0.18); }
+  .iconbtn {
+    width: 36px; height: 36px; border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.55);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-2);
+    position: relative;
+  }
+  .iconbtn .badge {
+    position: absolute; top: -2px; right: -2px;
+    min-width: 16px; height: 16px; padding: 0 4px;
+    border-radius: 999px;
+    background: var(--ember);
+    color: white;
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 2px var(--cream);
+  }
+  .avatar {
+    display:flex; align-items:center; gap: 10px;
+    padding-left: 6px;
+    border-left: 1px solid var(--line);
+    height: 36px;
+  }
+  .avatar .a {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg,#3a2f25, #1a1612);
+    color: #F4EEDF;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px; font-weight: 500;
+    box-shadow: inset 0 0 0 1px rgba(244,238,223,0.10);
+  }
+  .avatar .who { display: flex; flex-direction: column; line-height: 1.15; }
+  .avatar .who b { font-size: 12.5px; font-weight: 500; }
+  .avatar .who span { font-size: 11px; color: var(--mute); }
+
+  /* ── page ─────────────────────────────────────────── */
+  .page { padding: 32px 32px 0; display: flex; flex-direction: column; gap: 28px; }
+
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+  .page-head h2 {
+    margin: 0;
+    font-size: 30px; font-weight: 500; letter-spacing: -0.025em;
+  }
+  .page-head h2 b { font-weight: 600; }
+  .page-head .sub { margin-top: 8px; font-size: 13.5px; color: var(--mute); display: flex; gap: 14px; align-items: center; }
+  .page-head .sub .dot-sep { width: 3px; height: 3px; background: var(--mute-2); border-radius:50%; }
+  .page-head .actions { display: flex; gap: 10px; }
+  .btn {
+    height: 38px; padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .btn:hover { background: #fff; }
+  .btn.primary {
+    background: var(--ember);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 18px -8px rgba(217,64,42,0.55), 0 1px 0 rgba(24,20,15,0.06);
+  }
+  .btn.primary:hover { filter: brightness(1.04); }
+  .btn.dark {
+    background: var(--graphite-2); color: #F4EEDF; border-color: var(--graphite-3);
+  }
+
+  /* ── stat cards ───────────────────────────────────── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; overflow: hidden;
+  }
+  .stat .lbl {
+    font-size: 12px; color: var(--mute);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .stat .lbl .swatch {
+    width: 8px; height: 8px; border-radius: 2px;
+  }
+  .stat .val {
+    font-family: 'Geist', sans-serif;
+    font-size: 32px; font-weight: 500; letter-spacing: -0.02em;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .stat .val .unit { font-size: 13px; color: var(--mute); font-weight: 400; letter-spacing: 0; }
+  .stat .foot { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--mute); }
+  .stat .chg { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px; }
+  .chg.up   { color: #2F6A47; background: rgba(79,157,107,0.10); }
+  .chg.down { color: #8E3128; background: rgba(200,69,58,0.08); }
+  .chg.flat { color: var(--mute); background: rgba(24,20,15,0.05); }
+  .stat .spark { height: 28px; margin-top: 2px; }
+  .stat::after {
+    content:""; position:absolute; right:-30px; top:-30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: var(--ember-soft);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stat.featured::after { opacity: 1; }
+  .stat.featured {
+    background:
+      linear-gradient(180deg, rgba(244,183,49,0.06), transparent 50%),
+      var(--paper);
+    border-color: rgba(217,64,42,0.18);
+  }
+
+  /* ── charts row ───────────────────────────────────── */
+  .row-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .card-head {
+    padding: 16px 20px 12px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .card-head .ttl { display: flex; flex-direction: column; gap: 2px; }
+  .card-head .ttl b { font-size: 14px; font-weight: 500; letter-spacing: -0.005em; }
+  .card-head .ttl span { font-size: 12px; color: var(--mute); }
+  .seg {
+    display: inline-flex; padding: 3px;
+    background: var(--cream-3); border-radius: 9px;
+    font-size: 11.5px;
+  }
+  .seg span {
+    padding: 4px 10px;
+    border-radius: 7px;
+    color: var(--mute);
+    cursor: pointer;
+  }
+  .seg span.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(24,20,15,0.06); }
+  .card-body { padding: 18px 20px 20px; }
+
+  .legend { display:flex; gap: 16px; font-size: 11.5px; color: var(--mute); margin-top: 10px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; display: inline-block; vertical-align: middle; }
+
+  /* donut */
+  .donut-wrap { display: flex; gap: 18px; align-items: center; }
+  .donut { width: 168px; height: 168px; flex: none; position: relative; }
+  .donut .center {
+    position: absolute; inset: 0; display:flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .donut .center .big { font-size: 24px; letter-spacing: -0.02em; font-weight: 500; }
+  .donut .center .lbl { font-family:'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+  .banks { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .bank-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; font-size: 12.5px; }
+  .bank-row .pip { width: 28px; height: 28px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-family:'Geist Mono', monospace; font-size: 10px; font-weight: 600; color: white; }
+  .bank-row .nm b { font-weight: 500; }
+  .bank-row .nm small { display: block; font-family:'Geist Mono', monospace; font-size: 10.5px; color: var(--mute); }
+  .bank-row .v { font-family:'Geist Mono', monospace; font-size: 12.5px; }
+
+  /* ── two-col bottom ───────────────────────────────── */
+  .row-3 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+
+  /* recent payments table */
+  table.payments { width: 100%; border-collapse: separate; border-spacing: 0; }
+  table.payments th {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--mute); font-weight: 500;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-2);
+    background: linear-gradient(180deg, rgba(236,229,214,0.4), transparent);
+  }
+  table.payments td {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line-2);
+    vertical-align: middle;
+  }
+  table.payments tr:last-child td { border-bottom: 0; }
+  table.payments tr:hover td { background: rgba(244,183,49,0.04); }
+  .ref { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--ink-2); }
+  .ref-small { color: var(--mute); font-size: 10.5px; font-family: 'Geist Mono', monospace; }
+  .amount { font-family: 'Geist Mono', monospace; font-weight: 500; }
+  .who { display: flex; align-items: center; gap: 10px; }
+  .who .ai { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,#e0d6c1,#bfb39a); display:flex; align-items:center; justify-content:center; font-size: 10.5px; color: var(--ink-2); font-weight: 500; }
+  .who .ni { display: flex; flex-direction: column; line-height: 1.2; }
+  .who .ni b { font-size: 12.5px; font-weight: 500; }
+  .who .ni small { color: var(--mute); font-size: 10.5px; font-family:'Geist Mono', monospace; }
+  .bk { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+  .bk .pip { width: 20px; height: 20px; border-radius: 5px; display:flex; align-items:center; justify-content:center; font-family:'Geist Mono', monospace; font-size: 9px; font-weight: 600; color: white; }
+  .status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11.5px; padding: 3px 9px 3px 8px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .status .d { width: 6px; height: 6px; border-radius: 50%; }
+  .status.ok   { color: #2F6A47; background: rgba(79,157,107,0.12); }
+  .status.ok .d { background: var(--good); }
+  .status.pend { color: #8a601a; background: rgba(224,160,44,0.14); }
+  .status.pend .d { background: var(--warn); }
+  .status.fail { color: #8E3128; background: rgba(200,69,58,0.10); }
+  .status.fail .d { background: var(--bad); }
+  .status.rev  { color: var(--ink-2); background: rgba(24,20,15,0.06); }
+  .status.rev .d { background: var(--mute); }
+
+  /* validation card */
+  .validate {
+    background:
+      linear-gradient(180deg, rgba(244,183,49,0.08), transparent 80px),
+      var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .validate .hd {
+    padding: 16px 20px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .validate .hd .lf { display: flex; align-items: center; gap: 10px; }
+  .validate .hd .gi {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--ember);
+    display:flex; align-items:center; justify-content:center;
+    color: white;
+    box-shadow: 0 4px 10px -3px rgba(217,64,42,0.5);
+  }
+  .validate .hd b { font-size: 14px; font-weight: 600; letter-spacing: -0.005em; }
+  .validate .hd .ag { font-family:'Geist Mono', monospace; font-size: 10.5px; color: var(--mute); }
+
+  .form { padding: 16px 20px 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 11px; color: var(--mute); font-family:'Geist Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+  .input {
+    height: 38px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--cream-2);
+    padding: 0 12px;
+    font-size: 13px;
+    color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .input.filled { background: #fff; }
+  .input.focus { border-color: rgba(217,64,42,0.45); box-shadow: 0 0 0 3px rgba(217,64,42,0.10); background: #fff; }
+  .input .lead { font-family:'Geist Mono', monospace; color: var(--mute); font-size: 12px; }
+  .input .val  { font-family:'Geist Mono', monospace; font-size: 13px; color: var(--ink); }
+  .input .pl   { color: var(--mute-2); }
+  .input .ico  { color: var(--mute); margin-left: auto; }
+  .bankpick {
+    display:flex; align-items:center; gap:10px;
+    height: 38px; padding: 0 12px;
+    border-radius: 9px;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  .bankpick .pip { width: 22px; height: 22px; border-radius: 6px; color: white; display:flex; align-items:center; justify-content:center; font-family:'Geist Mono', monospace; font-size: 9px; font-weight: 600; }
+  .bankpick .nm { font-size: 13px; font-weight: 500; }
+  .bankpick .co { color: var(--mute); font-family:'Geist Mono', monospace; font-size: 11px; margin-left: auto; }
+
+  .validate .ft { padding: 14px 20px 18px; display: flex; align-items: center; gap: 10px; }
+  .validate .ft .hint { font-size: 11.5px; color: var(--mute); display: flex; align-items: center; gap: 8px; flex: 1; }
+
+  /* ── floating success card overlay ────────────────── */
+  .floating {
+    position: absolute;
+    width: 348px;
+    background: var(--paper);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .floating.success {
+    right: 56px;
+    top: 1300px;
+    z-index: 4;
+  }
+  .floating .top {
+    padding: 18px 20px 14px;
+    background:
+      linear-gradient(180deg, rgba(244,183,49,0.12), transparent 70%),
+      var(--paper);
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--line-2);
+    position: relative;
+  }
+  .check {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--ember);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 18px -6px rgba(217,64,42,0.55), inset 0 0 0 4px rgba(255,255,255,0.18);
+    flex: none;
+  }
+  .floating .top b { font-size: 15px; font-weight: 600; }
+  .floating .top span { font-size: 12px; color: var(--mute); display:block; margin-top: 2px; }
+  .floating .body { padding: 14px 20px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .kv label { display:block; font-family:'Geist Mono', monospace; font-size: 9.5px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--mute); margin-bottom: 3px; }
+  .kv .v { font-size: 13px; }
+  .kv .v.mono { font-family:'Geist Mono', monospace; font-size: 12.5px; }
+  .kv.full { grid-column: 1 / -1; }
+  .floating .ft {
+    padding: 12px 20px 16px;
+    display:flex; align-items:center; gap: 10px;
+    border-top: 1px solid var(--line-2);
+  }
+  .floating .ft .stamp { flex: 1; font-family:'Geist Mono', monospace; font-size: 10.5px; color: var(--mute); }
+  .btn.sm { height: 32px; padding: 0 10px; font-size: 12px; border-radius: 8px; }
+
+  /* ── insights row ─────────────────────────────────── */
+  .insight {
+    background:
+      linear-gradient(135deg, rgba(217,64,42,0.06) 0%, rgba(244,183,49,0.04) 60%, transparent 100%),
+      var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+  .insight .ti { font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; }
+  .insight .tx { font-size: 12.5px; color: var(--mute); line-height: 1.55; margin-top: 4px; max-width: 760px; }
+  .insight .bullet { display:inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 999px; font-family:'Geist Mono', monospace; font-size: 10.5px; background: var(--cream-3); color: var(--ink-2); }
+
+  /* ── mobile artboard ──────────────────────────────── */
+  .mobile-col {
+    display: flex; flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+  }
+  .mobile-art {
+    background: var(--graphite-1);
+    border-radius: 56px;
+    padding: 14px;
+    box-shadow:
+      var(--shadow-lg),
+      inset 0 0 0 1px rgba(255,255,255,0.04);
+    position: relative;
+  }
+  .mobile-screen {
+    width: 372px;
+    height: 800px;
+    border-radius: 44px;
+    background: var(--cream-2);
+    overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .mobile-status {
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 26px;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink);
+  }
+  .mobile-status .icos { display:flex; gap: 5px; align-items: center; }
+  .mobile-top {
+    padding: 4px 22px 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .mobile-top .menu {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mobile-top .ws {
+    flex: 1;
+    background: linear-gradient(135deg, var(--graphite-2), var(--graphite-3));
+    color: #F4EEDF;
+    border-radius: 14px;
+    padding: 8px 10px;
+    display:flex; align-items:center; gap: 10px;
+    border: 1px solid rgba(244,183,49,0.18);
+  }
+  .mobile-top .ws .lg { width: 28px; height: 28px; border-radius: 8px; background: var(--paper); display:flex; align-items:center; justify-content:center; }
+  .mobile-top .ws .nm { display: flex; flex-direction: column; gap: 1px; line-height: 1.1; }
+  .mobile-top .ws .nm b { font-size: 12.5px; }
+  .mobile-top .ws .nm span { font-size: 10px; color: #B0A797; font-family:'Geist Mono', monospace; letter-spacing: 0.05em; }
+  .mobile-top .av {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg,#3a2f25,#1a1612);
+    color: #F4EEDF;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12.5px; font-weight: 500;
+    box-shadow: inset 0 0 0 1px rgba(244,238,223,0.10);
+  }
+  .mobile-greet {
+    padding: 0 22px 12px;
+  }
+  .mobile-greet h3 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; }
+  .mobile-greet h3 b { font-weight: 600; }
+  .mobile-greet p { margin: 4px 0 0; font-size: 12px; color: var(--mute); }
+
+  .mobile-hero {
+    margin: 6px 22px 16px;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 80% at 100% 0%, rgba(255,255,255,0.10), transparent 60%),
+      var(--ember);
+    color: #fff;
+    padding: 18px 18px 16px;
+    box-shadow: 0 12px 30px -12px rgba(217,64,42,0.55);
+    position: relative;
+    overflow: hidden;
+  }
+  .mobile-hero::after {
+    content:""; position: absolute; inset: 0;
+    background:
+      radial-gradient(60% 60% at 15% 110%, rgba(0,0,0,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .mobile-hero .lbl { font-family:'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+  .mobile-hero .val { font-size: 38px; font-weight: 500; letter-spacing: -0.025em; margin-top: 6px; line-height: 1; display:flex; align-items: baseline; gap: 6px; }
+  .mobile-hero .val small { font-size: 14px; opacity: 0.85; }
+  .mobile-hero .delta { font-family:'Geist Mono', monospace; font-size: 11px; margin-top: 8px; opacity: 0.92; }
+  .mobile-hero .row { display:flex; gap: 8px; margin-top: 14px; position: relative; z-index: 1; }
+  .mobile-hero .row .b {
+    flex: 1;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .mobile-hero .row .b .lb { font-family:'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase; opacity: 0.9; }
+  .mobile-hero .row .b .vv { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; }
+
+  .mobile-section { padding: 0 22px; }
+  .mobile-section h4 {
+    margin: 6px 0 12px; font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mobile-section h4 span { font-family:'Geist Mono', monospace; font-size: 11px; color: var(--mute); font-weight: 400; }
+
+  .m-pay {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 12px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .m-pay .pip { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; color:white; font-family:'Geist Mono', monospace; font-size: 11px; font-weight: 600; }
+  .m-pay .meta { flex: 1; display:flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+  .m-pay .meta b { font-size: 12.5px; font-weight: 500; }
+  .m-pay .meta small { color: var(--mute); font-family:'Geist Mono', monospace; font-size: 10.5px; }
+  .m-pay .amt { font-family:'Geist Mono', monospace; font-size: 13px; font-weight: 500; }
+  .m-pay .stat { font-family:'Geist Mono', monospace; font-size: 10px; color: var(--good); }
+
+  .mobile-tab {
+    position: absolute; left: 16px; right: 16px; bottom: 16px;
+    height: 64px;
+    background: rgba(21,18,15,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: space-around;
+    padding: 0 18px;
+    color: #B6AE9F;
+    box-shadow: 0 16px 30px -12px rgba(0,0,0,0.45);
+  }
+  .mobile-tab .t { display: flex; flex-direction: column; align-items: center; gap: 3px; font-family:'Geist Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .mobile-tab .t.on { color: #F4EEDF; }
+  .mobile-tab .fab {
+    width: 50px; height: 50px; border-radius: 16px;
+    background: var(--ember);
+    color: white;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 22px -6px rgba(217,64,42,0.6);
+    transform: translateY(-12px);
+  }
+
+  /* validation states cluster */
+  .states-card {
+    width: 400px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+  .states-card .hd {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 14px;
+  }
+  .states-card .hd b { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+  .states-card .hd span { font-family:'Geist Mono', monospace; font-size: 10.5px; color: var(--mute); }
+  .state {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 12px 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 10px;
+    background: var(--cream-2);
+  }
+  .state .ic { width: 30px; height: 30px; border-radius: 8px; display:flex; align-items:center; justify-content:center; flex: none; }
+  .state.ok   { background: linear-gradient(180deg, rgba(79,157,107,0.10), rgba(79,157,107,0.04)); border-color: rgba(79,157,107,0.25); }
+  .state.ok   .ic { background: rgba(79,157,107,0.18); color: #2F6A47; }
+  .state.pend { background: linear-gradient(180deg, rgba(224,160,44,0.10), rgba(224,160,44,0.03)); border-color: rgba(224,160,44,0.28); }
+  .state.pend .ic { background: rgba(224,160,44,0.16); color: #8a601a; }
+  .state.fail { background: linear-gradient(180deg, rgba(200,69,58,0.08), rgba(200,69,58,0.03)); border-color: rgba(200,69,58,0.24); }
+  .state.fail .ic { background: rgba(200,69,58,0.14); color: #8E3128; }
+  .state .meta { flex: 1; line-height: 1.3; min-width: 0; }
+  .state .meta b { font-size: 13px; font-weight: 600; display:block; }
+  .state .meta span { font-size: 11.5px; color: var(--mute); }
+  .state .ref { font-family:'Geist Mono', monospace; font-size: 11px; color: var(--ink-2); }
+
+  /* misc */
+  .icon { width: 16px; height: 16px; }
+  .ssvg { display: block; }
+  ::selection { background: rgba(233,122,31,0.25); }
+</style>
+</head>
+<body>
+
+<!-- ░░ ICON LIBRARY ░░ -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <defs>
+    <!-- nav -->
+    <symbol id="i-home" viewBox="0 0 16 16"><path d="M2.5 7.2L8 2.5l5.5 4.7v6.1a.7.7 0 0 1-.7.7H9.7v-4.3H6.3V14H3.2a.7.7 0 0 1-.7-.7V7.2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check-shield" viewBox="0 0 16 16"><path d="M8 1.5L13 3v4.4c0 3.3-2.1 6.1-5 7.1-2.9-1-5-3.8-5-7.1V3l5-1.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.8 8.2l1.6 1.6L10.2 7" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-list" viewBox="0 0 16 16"><path d="M3 4h10M3 8h10M3 12h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-close-day" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3M5.5 10.5l1.4 1.4L10 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 16 16"><path d="M2.5 13.5h11M4 11V8M7 11V5M10 11V7M13 11V3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 16 16"><circle cx="6" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2 13.5c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="11.5" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M11 10c1.7 0 3 1 3 3" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+    <symbol id="i-cog" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 1.5v2M8 12.5v2M3.5 8h-2M14.5 8h-2M4.4 4.4l-1.4-1.4M13 13l-1.4-1.4M4.4 11.6L3 13M13 3l-1.4 1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <!-- ui -->
+    <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10 10l3.5 3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 16 16"><path d="M4 11h8c-.7-.7-1-1.7-1-3V6a3 3 0 0 0-6 0v2c0 1.3-.3 2.3-1 3z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.5 12.8a1.5 1.5 0 0 0 3 0" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+    <symbol id="i-cmd" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-up-r" viewBox="0 0 16 16"><path d="M5 11L11 5M6 5h5v5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-r" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 16 16"><path d="M8 1.5l1.7 4.3L14 7.5l-3.5 2.7 1 4.3L8 12.2l-3.5 2.3 1-4.3L2 7.5l4.3-1.7L8 1.5z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v4M8 5v.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 16 16"><circle cx="4" cy="8" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="12" cy="8" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 16 16"><path d="M2.5 4h11l-4 5v4l-3-1.5V9l-4-5z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-dl" viewBox="0 0 16 16"><path d="M8 3v8M5 8l3 3 3-3M3 13.5h10" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 16 16"><rect x="5" y="2" width="6" height="12" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7.2 12.4h1.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-id" viewBox="0 0 16 16"><rect x="2" y="3.5" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="6" cy="8" r="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4 11c0-1 1-1.7 2-1.7s2 .7 2 1.7M10 7h2.5M10 9.5h1.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 16 16"><path d="M2 6.5L8 3l6 3.5V8H2V6.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M3.5 8v4M6.5 8v4M9.5 8v4M12.5 8v4M2 12.5h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-link" viewBox="0 0 16 16"><path d="M7 9.5l2.5 2.5a2 2 0 0 0 3-3L10 6.5M9 6.5L6.5 4a2 2 0 0 0-3 3L6 9.5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield-warn" viewBox="0 0 16 16"><path d="M8 1.5L13 3v4.4c0 3.3-2.1 6.1-5 7.1-2.9-1-5-3.8-5-7.1V3l5-1.5z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 5v4M8 10.6v.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 16 16"><path d="M4 6h8M9 3l3 3-3 3M12 10H4M7 13l-3-3 3-3" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <!-- mobile tab -->
+    <symbol id="i-tab-home" viewBox="0 0 22 22"><path d="M3.5 10L11 4l7.5 6v8.2a.8.8 0 0 1-.8.8H4.3a.8.8 0 0 1-.8-.8V10z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-tab-list" viewBox="0 0 22 22"><path d="M4.5 5.5h13M4.5 11h13M4.5 16.5h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-tab-chart" viewBox="0 0 22 22"><path d="M3.5 18.5h15M5.5 16V11M9.5 16V7M13.5 16V9M17.5 16V5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="i-tab-user" viewBox="0 0 22 22"><circle cx="11" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M4.5 18.5c0-3 3-5 6.5-5s6.5 2 6.5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+
+<div class="canvas">
+
+  <!-- ░ header ░ -->
+  <div class="canvas-head">
+    <h1>YaCayó <span class="tag">— Pagos conciliados en segundos.</span></h1>
+    <div class="meta">
+      <span><span class="dot"></span> Dashboard · Producto v1.4</span>
+      <span>1440 × Desktop</span>
+      <span>372 × Mobile</span>
+    </div>
+  </div>
+
+
+  <!-- ░░░░░░░░░░░░░░░░ DESKTOP ARTBOARD ░░░░░░░░░░░░░░░░ -->
+  <div class="artboard">
+    <div class="app">
+
+      <!-- ── SIDEBAR ──────────────────────────────── -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-word">YaCayó<span class="dim">VE</span></div>
+        </div>
+
+        <!-- workspace switcher -->
+        <div class="workspace" title="Cambiar de empresa">
+          <div class="ws-logo" aria-label="Logo FerreSolar">
+            <!-- generic warm geometric mark — not a recreation of a real brand -->
+            <svg width="22" height="22" viewBox="0 0 22 22" class="ssvg">
+              <defs>
+                <linearGradient id="fsg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#D9402A"/>
+                  <stop offset="0.55" stop-color="#E97A1F"/>
+                  <stop offset="1" stop-color="#F4B731"/>
+                </linearGradient>
+              </defs>
+              <circle cx="11" cy="11" r="9" fill="url(#fsg)"/>
+              <path d="M11 4.5v13M4.5 11h13M6.4 6.4l9.2 9.2M15.6 6.4l-9.2 9.2" stroke="#FBF7EE" stroke-width="1.2" stroke-linecap="round" opacity="0.95"/>
+              <circle cx="11" cy="11" r="2.4" fill="#FBF7EE"/>
+            </svg>
+          </div>
+          <div class="ws-name">
+            <div class="top">
+              <b>FerreSolar&nbsp;C.A.</b>
+              <span class="badge">Activo</span>
+            </div>
+            <div class="sub"><span class="live"></span>RIF J-40291837-2 · Sede Maracay</div>
+          </div>
+          <button class="swap" aria-label="Cambiar empresa" style="background: transparent; border: 0; padding: 4px; cursor: pointer;">
+            <svg width="14" height="14" viewBox="0 0 16 16"><use href="#i-swap"/></svg>
+          </button>
+        </div>
+
+        <!-- nav -->
+        <div class="nav-section">
+          <div class="label">Operación</div>
+          <div class="nav-item active">
+            <svg class="ico"><use href="#i-home"/></svg>
+            Inicio
+          </div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-check-shield"/></svg>
+            Validar Pago
+            <span class="kbd">V</span>
+          </div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-list"/></svg>
+            Pagos Recientes
+            <span class="count">12</span>
+          </div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-close-day"/></svg>
+            Cierre de Día
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="label">Análisis</div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-chart"/></svg>
+            Reportes
+          </div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-users"/></svg>
+            Usuarios
+          </div>
+          <div class="nav-item">
+            <svg class="ico"><use href="#i-cog"/></svg>
+            Configuración
+          </div>
+        </div>
+
+        <!-- footer: operational day -->
+        <div class="sidebar-foot">
+          <div class="opday">
+            <div class="row">
+              <span class="live" style="width:6px;height:6px;border-radius:50%;background:var(--ember-2);box-shadow:0 0 0 3px rgba(233,122,31,0.2);"></span>
+              <b>Día operativo abierto</b>
+            </div>
+            <div class="bar"><i></i></div>
+            <div class="meta">
+              <span>08:30 — apertura</span>
+              <span>17:00 cierre</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items: center; gap: 10px; padding: 4px 6px 0; color:#9C9385; font-size: 11.5px;">
+            <svg width="14" height="14" viewBox="0 0 16 16" style="color:#9C9385;"><use href="#i-info"/></svg>
+            <span>Conciliación automática activa</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── MAIN ─────────────────────────────────── -->
+      <main class="main">
+
+        <!-- topbar -->
+        <div class="topbar">
+          <div class="crumbs">
+            Inicio <span class="sep">›</span> <b>Resumen del día</b>
+          </div>
+          <div class="search">
+            <svg class="icon" style="color:var(--mute);"><use href="#i-search"/></svg>
+            <span>Buscar por referencia, monto, cédula o teléfono…</span>
+            <span class="kbd">⌘K</span>
+          </div>
+          <div class="spacer"></div>
+          <div class="pill warm">
+            <span class="dot"></span>
+            Día operativo · <b style="color:var(--ink); font-weight:500;">23 may, 14:42</b>
+          </div>
+          <button class="iconbtn" aria-label="Notificaciones">
+            <svg class="icon"><use href="#i-bell"/></svg>
+            <span class="badge">3</span>
+          </button>
+          <div class="avatar">
+            <div class="a">AS</div>
+            <div class="who">
+              <b>Andrés Salazar</b>
+              <span>Administrador</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- page content -->
+        <div class="page">
+
+          <!-- heading -->
+          <div class="page-head">
+            <div>
+              <h2>Buen día, <b>Andrés</b>.</h2>
+              <div class="sub">
+                <span>Resumen del día — Viernes 23 de mayo, 2025</span>
+                <span class="dot-sep"></span>
+                <span>Última conciliación hace 4 min</span>
+                <span class="dot-sep"></span>
+                <span>3 bancos conectados</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn">
+                <svg class="icon"><use href="#i-dl"/></svg>
+                Exportar
+              </button>
+              <button class="btn">
+                <svg class="icon"><use href="#i-close-day"/></svg>
+                Cerrar día
+              </button>
+              <button class="btn primary">
+                <svg class="icon"><use href="#i-plus"/></svg>
+                Validar pago
+              </button>
+            </div>
+          </div>
+
+          <!-- stats -->
+          <div class="stats">
+            <div class="stat featured">
+              <div class="lbl"><span class="swatch" style="background:var(--ember);"></span> Total validado hoy</div>
+              <div class="val">Bs <span class="num">847.320,40</span></div>
+              <div class="foot">
+                <span class="chg up">▲ 18.4% vs ayer</span>
+                <svg width="92" height="28" viewBox="0 0 92 28" class="spark">
+                  <defs>
+                    <linearGradient id="sp1" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#E97A1F" stop-opacity="0.35"/>
+                      <stop offset="1" stop-color="#E97A1F" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M2,22 L12,18 L22,20 L32,14 L42,16 L52,10 L62,12 L72,6 L82,8 L90,4 L90,28 L2,28 Z" fill="url(#sp1)"/>
+                  <path d="M2,22 L12,18 L22,20 L32,14 L42,16 L52,10 L62,12 L72,6 L82,8 L90,4" fill="none" stroke="#E97A1F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="lbl"><span class="swatch" style="background:#2F6A47;"></span> Pagos procesados</div>
+              <div class="val"><span class="num">142</span><span class="unit">/ 158 hoy</span></div>
+              <div class="foot">
+                <span class="chg up">▲ 12</span>
+                <svg width="92" height="28" viewBox="0 0 92 28" class="spark">
+                  <path d="M2,20 L12,22 L22,16 L32,18 L42,14 L52,16 L62,10 L72,12 L82,8 L90,10" fill="none" stroke="#4F9D6B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="lbl"><span class="swatch" style="background:var(--warn);"></span> Pendientes de revisión</div>
+              <div class="val"><span class="num">7</span><span class="unit">requieren atención</span></div>
+              <div class="foot">
+                <span class="chg flat">— sin cambio</span>
+                <svg width="92" height="28" viewBox="0 0 92 28" class="spark">
+                  <path d="M2,14 L12,16 L22,14 L32,16 L42,14 L52,16 L62,14 L72,16 L82,14 L90,16" fill="none" stroke="#E0A02C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 3"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="lbl"><span class="swatch" style="background:var(--ink-2);"></span> Bancos conectados</div>
+              <div class="val"><span class="num">3</span><span class="unit">/ 4 disponibles</span></div>
+              <div class="foot">
+                <span class="chg flat" style="display:inline-flex;gap:6px;align-items:center;">
+                  <span class="d" style="width:5px;height:5px;border-radius:50%;background:var(--good);display:inline-block"></span>
+                  <span class="d" style="width:5px;height:5px;border-radius:50%;background:var(--good);display:inline-block"></span>
+                  <span class="d" style="width:5px;height:5px;border-radius:50%;background:var(--good);display:inline-block"></span>
+                  <span class="d" style="width:5px;height:5px;border-radius:50%;background:var(--bad);display:inline-block"></span>
+                  &nbsp;1 desconectado
+                </span>
+                <span style="font-family:'Geist Mono', monospace; font-size:10.5px; color: var(--mute);">↻ sync 4m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- charts row -->
+          <div class="row-2">
+            <!-- left big chart -->
+            <div class="card">
+              <div class="card-head">
+                <div class="ttl">
+                  <b>Volumen conciliado</b>
+                  <span>Bolívares · últimos 14 días</span>
+                </div>
+                <div class="seg">
+                  <span>24h</span>
+                  <span class="on">14d</span>
+                  <span>30d</span>
+                  <span>3m</span>
+                </div>
+              </div>
+              <div class="card-body" style="padding-top: 10px;">
+
+                <!-- chart -->
+                <svg viewBox="0 0 760 260" width="100%" height="260" preserveAspectRatio="none" style="display:block;">
+                  <defs>
+                    <linearGradient id="areaA" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#E97A1F" stop-opacity="0.32"/>
+                      <stop offset="1" stop-color="#E97A1F" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="areaB" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#F4B731" stop-opacity="0.22"/>
+                      <stop offset="1" stop-color="#F4B731" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- grid -->
+                  <g stroke="rgba(24,20,15,0.06)" stroke-dasharray="2 4">
+                    <line x1="40" x2="740" y1="40"  y2="40"/>
+                    <line x1="40" x2="740" y1="100" y2="100"/>
+                    <line x1="40" x2="740" y1="160" y2="160"/>
+                    <line x1="40" x2="740" y1="220" y2="220"/>
+                  </g>
+                  <!-- y labels -->
+                  <g font-family="Geist Mono" font-size="10" fill="rgba(24,20,15,0.45)">
+                    <text x="34" y="44" text-anchor="end">1.2M</text>
+                    <text x="34" y="104" text-anchor="end">900k</text>
+                    <text x="34" y="164" text-anchor="end">600k</text>
+                    <text x="34" y="224" text-anchor="end">300k</text>
+                  </g>
+
+                  <!-- area B (comparison ayer) -->
+                  <path d="M40,180 L90,170 L140,176 L190,160 L240,168 L290,150 L340,154 L390,138 L440,148 L490,134 L540,142 L590,128 L640,134 L690,118 L740,122 L740,240 L40,240 Z" fill="url(#areaB)"/>
+                  <path d="M40,180 L90,170 L140,176 L190,160 L240,168 L290,150 L340,154 L390,138 L440,148 L490,134 L540,142 L590,128 L640,134 L690,118 L740,122" fill="none" stroke="#F4B731" stroke-width="1.4" stroke-dasharray="3 3"/>
+
+                  <!-- area A (hoy) -->
+                  <path d="M40,150 L90,138 L140,150 L190,120 L240,128 L290,100 L340,108 L390,84 L440,98 L490,70 L540,86 L590,58 L640,72 L690,40 L740,52 L740,240 L40,240 Z" fill="url(#areaA)"/>
+                  <path d="M40,150 L90,138 L140,150 L190,120 L240,128 L290,100 L340,108 L390,84 L440,98 L490,70 L540,86 L590,58 L640,72 L690,40 L740,52" fill="none" stroke="#E97A1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+                  <!-- highlight point -->
+                  <g>
+                    <line x1="690" x2="690" y1="40" y2="240" stroke="rgba(24,20,15,0.16)" stroke-dasharray="2 3"/>
+                    <circle cx="690" cy="40" r="5" fill="#FBF7EE" stroke="#D9402A" stroke-width="2"/>
+                  </g>
+                  <!-- tooltip -->
+                  <g transform="translate(606,8)">
+                    <rect x="0" y="0" width="170" height="56" rx="10" fill="#18140F"/>
+                    <text x="14" y="20" font-family="Geist Mono" font-size="9" fill="#9A9285" letter-spacing="0.06em">JUEVES 22 MAY</text>
+                    <text x="14" y="40" font-family="Geist" font-size="14" font-weight="500" fill="#FBF7EE">Bs 1.142.580</text>
+                    <circle cx="155" cy="34" r="3" fill="#E97A1F"/>
+                  </g>
+
+                  <!-- x labels -->
+                  <g font-family="Geist Mono" font-size="10" fill="rgba(24,20,15,0.42)">
+                    <text x="40"  y="256">10/05</text>
+                    <text x="190" y="256">13/05</text>
+                    <text x="340" y="256">16/05</text>
+                    <text x="490" y="256">19/05</text>
+                    <text x="640" y="256">22/05</text>
+                  </g>
+                </svg>
+
+                <div class="legend">
+                  <span><span class="sw" style="background:var(--ember-2);"></span>Este período</span>
+                  <span><span class="sw" style="background:var(--ember-3); opacity:0.7"></span>Período anterior</span>
+                  <span style="margin-left:auto; font-family:'Geist Mono', monospace; font-size: 11px;">
+                    Total 14d: <b style="color:var(--ink); font-weight:500;">Bs 11.426.880</b>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- right donut -->
+            <div class="card">
+              <div class="card-head">
+                <div class="ttl">
+                  <b>Distribución por banco</b>
+                  <span>Pagos validados hoy</span>
+                </div>
+                <button class="btn sm" style="font-size:11.5px;">
+                  Ver todos
+                  <svg class="icon"><use href="#i-arrow-r"/></svg>
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="donut-wrap">
+                  <div class="donut">
+                    <svg viewBox="0 0 42 42">
+                      <!-- circumference is ~100 -->
+                      <circle cx="21" cy="21" r="15.915" fill="none" stroke="rgba(24,20,15,0.05)" stroke-width="6"/>
+                      <!-- Banesco 48 -->
+                      <circle cx="21" cy="21" r="15.915" fill="none" stroke="#D9402A" stroke-width="6"
+                        stroke-dasharray="48 52" stroke-dashoffset="25" stroke-linecap="butt"/>
+                      <!-- Mercantil 31 (starts at -48) -->
+                      <circle cx="21" cy="21" r="15.915" fill="none" stroke="#E97A1F" stroke-width="6"
+                        stroke-dasharray="31 69" stroke-dashoffset="-23" stroke-linecap="butt"/>
+                      <!-- BdV 18 -->
+                      <circle cx="21" cy="21" r="15.915" fill="none" stroke="#F4B731" stroke-width="6"
+                        stroke-dasharray="18 82" stroke-dashoffset="-54" stroke-linecap="butt"/>
+                      <!-- Otros 3 -->
+                      <circle cx="21" cy="21" r="15.915" fill="none" stroke="#322B25" stroke-width="6"
+                        stroke-dasharray="3 97" stroke-dashoffset="-72" stroke-linecap="butt"/>
+                    </svg>
+                    <div class="center">
+                      <div class="big num">142</div>
+                      <div class="lbl">Pagos · hoy</div>
+                    </div>
+                  </div>
+
+                  <div class="banks">
+                    <div class="bank-row">
+                      <div class="pip" style="background:#D9402A;">BN</div>
+                      <div class="nm"><b>Banesco</b><small>0134 · 68 pagos</small></div>
+                      <div class="v">48%</div>
+                    </div>
+                    <div class="bank-row">
+                      <div class="pip" style="background:#E97A1F;">MC</div>
+                      <div class="nm"><b>Mercantil</b><small>0105 · 44 pagos</small></div>
+                      <div class="v">31%</div>
+                    </div>
+                    <div class="bank-row">
+                      <div class="pip" style="background:#F4B731; color:#3a2410;">BV</div>
+                      <div class="nm"><b>Banco de Venezuela</b><small>0102 · 26 pagos</small></div>
+                      <div class="v">18%</div>
+                    </div>
+                    <div class="bank-row">
+                      <div class="pip" style="background:#322B25;">+</div>
+                      <div class="nm"><b>Otros</b><small>BNC, Provincial · 4 pagos</small></div>
+                      <div class="v">3%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- insight strip -->
+          <div class="insight">
+            <div>
+              <div class="ti">
+                <span class="bullet" style="background: var(--ember-soft); color:#8a3a14;">▲ Hallazgo</span>
+                &nbsp; Banesco está procesando 22% más rápido hoy que el promedio de la semana.
+              </div>
+              <div class="tx">
+                El tiempo medio de validación bajó de <b class="num" style="color:var(--ink);">3.4s</b> a <b class="num" style="color:var(--ink);">2.6s</b>. Mercantil presenta una demora intermitente entre 12:00 — 13:30. Recomendamos priorizar Banesco para conciliaciones masivas durante el resto del día.
+              </div>
+            </div>
+            <button class="btn dark">
+              <svg class="icon"><use href="#i-spark"/></svg>
+              Ver análisis
+              <svg class="icon"><use href="#i-arrow-r"/></svg>
+            </button>
+          </div>
+
+
+          <!-- recent + validation -->
+          <div class="row-3">
+
+            <!-- recent payments -->
+            <div class="card">
+              <div class="card-head">
+                <div class="ttl">
+                  <b>Actividad reciente</b>
+                  <span>Últimos 8 pagos · actualizado en vivo</span>
+                </div>
+                <div style="display:flex; gap: 8px;">
+                  <button class="btn sm">
+                    <svg class="icon"><use href="#i-filter"/></svg>
+                    Filtrar
+                  </button>
+                  <button class="btn sm">
+                    Ver todos
+                    <svg class="icon"><use href="#i-arrow-r"/></svg>
+                  </button>
+                </div>
+              </div>
+              <table class="payments">
+                <thead>
+                  <tr>
+                    <th>Referencia</th>
+                    <th>Banco</th>
+                    <th>Cliente</th>
+                    <th style="text-align:right;">Monto</th>
+                    <th>Estado</th>
+                    <th style="text-align:right;">Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="ref">013482910374</div>
+                      <div class="ref-small">Pago Móvil C2P</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#D9402A;">BN</span> Banesco</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">MR</div>
+                        <div class="ni"><b>María Romero</b><small>V-19.842.110</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 12.480,00</td>
+                    <td><span class="status ok"><span class="d"></span>Validado</span></td>
+                    <td style="text-align:right;" class="ref-small">14:38</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">010592847391</div>
+                      <div class="ref-small">Pago Móvil</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#E97A1F;">MC</span> Mercantil</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">JC</div>
+                        <div class="ni"><b>Construcciones Andina C.A.</b><small>J-30184772-1</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 184.500,00</td>
+                    <td><span class="status ok"><span class="d"></span>Validado</span></td>
+                    <td style="text-align:right;" class="ref-small">14:31</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">010294810263</div>
+                      <div class="ref-small">Pago Móvil</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#F4B731; color:#3a2410;">BV</span> BdV</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">LP</div>
+                        <div class="ni"><b>Luis Pernía</b><small>V-15.224.901</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 3.250,00</td>
+                    <td><span class="status pend"><span class="d"></span>En revisión</span></td>
+                    <td style="text-align:right;" class="ref-small">14:24</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">013438192740</div>
+                      <div class="ref-small">Pago Móvil C2P</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#D9402A;">BN</span> Banesco</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">RA</div>
+                        <div class="ni"><b>Rosa Aguilar</b><small>V-12.041.776</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 8.940,50</td>
+                    <td><span class="status ok"><span class="d"></span>Validado</span></td>
+                    <td style="text-align:right;" class="ref-small">14:18</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">010519384720</div>
+                      <div class="ref-small">Pago Móvil</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#E97A1F;">MC</span> Mercantil</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">CG</div>
+                        <div class="ni"><b>Carlos Gutiérrez</b><small>V-21.092.318</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 22.100,00</td>
+                    <td><span class="status fail"><span class="d"></span>No encontrado</span></td>
+                    <td style="text-align:right;" class="ref-small">14:11</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">013492840192</div>
+                      <div class="ref-small">Pago Móvil</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#D9402A;">BN</span> Banesco</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">IT</div>
+                        <div class="ni"><b>Inversiones Toledo</b><small>J-41098273-0</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 96.420,00</td>
+                    <td><span class="status ok"><span class="d"></span>Validado</span></td>
+                    <td style="text-align:right;" class="ref-small">14:02</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">010274839201</div>
+                      <div class="ref-small">Pago Móvil C2P</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#F4B731; color:#3a2410;">BV</span> BdV</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">EM</div>
+                        <div class="ni"><b>Elena Mendoza</b><small>V-9.842.011</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 1.840,00</td>
+                    <td><span class="status ok"><span class="d"></span>Validado</span></td>
+                    <td style="text-align:right;" class="ref-small">13:58</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="ref">013420918374</div>
+                      <div class="ref-small">Pago Móvil</div>
+                    </td>
+                    <td>
+                      <div class="bk"><span class="pip" style="background:#D9402A;">BN</span> Banesco</div>
+                    </td>
+                    <td>
+                      <div class="who">
+                        <div class="ai">FB</div>
+                        <div class="ni"><b>Ferretería Bolívar</b><small>J-29384712-3</small></div>
+                      </div>
+                    </td>
+                    <td style="text-align:right;" class="amount">Bs 64.300,00</td>
+                    <td><span class="status rev"><span class="d"></span>Duplicado</span></td>
+                    <td style="text-align:right;" class="ref-small">13:51</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- validation module -->
+            <div class="validate">
+              <div class="hd">
+                <div class="lf">
+                  <div class="gi">
+                    <svg class="icon" style="width:14px;height:14px;"><use href="#i-check-shield"/></svg>
+                  </div>
+                  <div>
+                    <b>Validar Pago Móvil</b>
+                    <div class="ag">Conciliación en tiempo real</div>
+                  </div>
+                </div>
+                <span class="pill" style="font-size:10.5px; padding: 3px 8px;">
+                  <span class="dot" style="width:6px;height:6px;background:var(--good); box-shadow:0 0 0 2px rgba(79,157,107,0.14);"></span>
+                  Auto-detect
+                </span>
+              </div>
+
+              <div class="form">
+                <div class="field full">
+                  <label>Banco emisor</label>
+                  <div class="bankpick">
+                    <span class="pip" style="background:#D9402A;">BN</span>
+                    <span class="nm">Banesco</span>
+                    <span class="co">0134</span>
+                    <svg class="icon" style="color:var(--mute); margin-left:8px;"><use href="#i-arrow-down"/></svg>
+                  </div>
+                </div>
+
+                <div class="field full">
+                  <label>Número de referencia</label>
+                  <div class="input focus filled">
+                    <span class="lead">Ref.</span>
+                    <span class="val">013482910374</span>
+                    <svg class="icon" style="color:var(--good); margin-left:auto;"><use href="#i-check"/></svg>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Monto (Bs)</label>
+                  <div class="input filled">
+                    <span class="lead">Bs</span>
+                    <span class="val">12.480,00</span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Fecha</label>
+                  <div class="input filled">
+                    <span class="val">23/05/2025</span>
+                    <svg class="icon"><use href="#i-cal"/></svg>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Teléfono pagador</label>
+                  <div class="input filled">
+                    <span class="lead">+58</span>
+                    <span class="val">412 884 1192</span>
+                    <svg class="icon"><use href="#i-phone"/></svg>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Cédula / RIF</label>
+                  <div class="input filled">
+                    <span class="lead">V</span>
+                    <span class="val">19.842.110</span>
+                    <svg class="icon"><use href="#i-id"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ft">
+                <div class="hint">
+                  <svg class="icon" style="color:var(--mute);"><use href="#i-info"/></svg>
+                  Los datos se comparan contra el extracto bancario en vivo.
+                </div>
+                <button class="btn">Limpiar</button>
+                <button class="btn primary">
+                  Validar pago
+                  <svg class="icon"><use href="#i-arrow-r"/></svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ── FLOATING VALIDATION SUCCESS CARD ── -->
+    <div class="floating success">
+      <div class="top">
+        <div class="check">
+          <svg width="22" height="22" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+        </div>
+        <div>
+          <b>Pago validado</b>
+          <span>Coincidencia exacta encontrada en Banesco · 2.4&nbsp;s</span>
+        </div>
+      </div>
+      <div class="body">
+        <div class="kv full">
+          <label>Referencia</label>
+          <div class="v mono">013482910374</div>
+        </div>
+        <div class="kv">
+          <label>Monto</label>
+          <div class="v mono">Bs 12.480,00</div>
+        </div>
+        <div class="kv">
+          <label>Fecha</label>
+          <div class="v mono">23/05/2025 · 14:36</div>
+        </div>
+        <div class="kv">
+          <label>Banco detectado</label>
+          <div class="v" style="display:flex;align-items:center;gap:7px;">
+            <span class="pip" style="width:18px;height:18px;border-radius:5px;background:#D9402A; color:white; font-family:'Geist Mono', monospace; font-size:8.5px; font-weight:600; display:flex;align-items:center;justify-content:center;">BN</span>
+            Banesco
+          </div>
+        </div>
+        <div class="kv">
+          <label>Pagador</label>
+          <div class="v">María Romero</div>
+        </div>
+        <div class="kv full">
+          <label>Validado por</label>
+          <div class="v" style="display:flex;align-items:center;gap:8px;">
+            <span style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#3a2f25,#1a1612);color:#F4EEDF;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;">AS</span>
+            Andrés Salazar · Administrador
+          </div>
+        </div>
+      </div>
+      <div class="ft">
+        <div class="stamp">ID-VAL · 2025-05-23-00824</div>
+        <button class="btn sm">
+          <svg class="icon"><use href="#i-link"/></svg>
+          Copiar
+        </button>
+        <button class="btn sm dark">
+          Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ░░░░░░░░░░░░░░░░ RIGHT COLUMN ░░░░░░░░░░░░░░░░ -->
+  <div class="mobile-col">
+
+    <!-- callout label -->
+    <div style="padding: 4px 4px 0;">
+      <div class="meta mono" style="font-size:11px; letter-spacing:0.10em; text-transform:uppercase; color:var(--mute);">02 — Mobile</div>
+      <div style="font-size: 18px; font-weight: 500; margin-top: 6px; letter-spacing: -0.015em;">
+        Touch-first conciliación
+      </div>
+      <div style="font-size: 12.5px; color: var(--mute); margin-top: 4px; line-height: 1.55; max-width: 340px;">
+        Sidebar colapsado, navegación flotante, FAB dedicado para validar al instante. Mismas primitivas, densidad adaptada.
+      </div>
+    </div>
+
+    <!-- mobile device -->
+    <div class="mobile-art">
+      <div class="mobile-screen">
+        <div class="mobile-status">
+          <span class="mono">9:41</span>
+          <span class="icos">
+            <svg width="16" height="10" viewBox="0 0 16 10"><rect x="0" y="6" width="2" height="4" rx="0.5" fill="#18140F"/><rect x="3" y="4" width="2" height="6" rx="0.5" fill="#18140F"/><rect x="6" y="2" width="2" height="8" rx="0.5" fill="#18140F"/><rect x="9" y="0" width="2" height="10" rx="0.5" fill="#18140F"/></svg>
+            <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" fill="none" stroke="#18140F" stroke-opacity="0.5"/><rect x="2" y="2" width="14" height="7" rx="1.5" fill="#18140F"/><path d="M22 3.5v4c.7-.3 1.2-1 1.2-2s-.5-1.7-1.2-2z" fill="#18140F" opacity="0.5"/></svg>
+          </span>
+        </div>
+
+        <div class="mobile-top">
+          <div class="menu">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8" stroke="#18140F" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ws">
+            <div class="lg">
+              <svg width="20" height="20" viewBox="0 0 22 22">
+                <defs><linearGradient id="fsg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9402A"/><stop offset="0.55" stop-color="#E97A1F"/><stop offset="1" stop-color="#F4B731"/></linearGradient></defs>
+                <circle cx="11" cy="11" r="9" fill="url(#fsg2)"/>
+                <path d="M11 4.5v13M4.5 11h13" stroke="#FBF7EE" stroke-width="1.2" stroke-linecap="round" opacity="0.95"/>
+                <circle cx="11" cy="11" r="2.4" fill="#FBF7EE"/>
+              </svg>
+            </div>
+            <div class="nm">
+              <b>FerreSolar C.A.</b>
+              <span>· DÍA ABIERTO</span>
+            </div>
+          </div>
+          <div class="av">AS</div>
+        </div>
+
+        <div class="mobile-greet">
+          <h3>Buen día, <b>Andrés</b></h3>
+          <p>Resumen del día — 23 de mayo</p>
+        </div>
+
+        <div class="mobile-hero">
+          <div class="lbl">Total validado hoy</div>
+          <div class="val">Bs <span class="num">847.320</span><small>,40</small></div>
+          <div class="delta">▲ 18.4% vs ayer · 142 pagos procesados</div>
+          <div class="row">
+            <div class="b">
+              <div class="lb">Pendientes</div>
+              <div class="vv num">7</div>
+            </div>
+            <div class="b">
+              <div class="lb">Bancos</div>
+              <div class="vv num">3<span style="opacity:0.55;font-size:12px;">/4</span></div>
+            </div>
+            <div class="b">
+              <div class="lb">Tiempo</div>
+              <div class="vv num">2.6<span style="opacity:0.7;font-size:11px;">s</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-section">
+          <h4>Actividad <span>hoy · 142</span></h4>
+
+          <div class="m-pay">
+            <div class="pip" style="background:#D9402A;">BN</div>
+            <div class="meta">
+              <b>María Romero</b>
+              <small>013482910374 · 14:38</small>
+            </div>
+            <div style="text-align:right; display: flex; flex-direction: column; line-height: 1.2;">
+              <span class="amt">Bs 12.480</span>
+              <span class="stat">● Validado</span>
+            </div>
+          </div>
+
+          <div class="m-pay">
+            <div class="pip" style="background:#E97A1F;">MC</div>
+            <div class="meta">
+              <b>Construcc. Andina</b>
+              <small>010592847391 · 14:31</small>
+            </div>
+            <div style="text-align:right; display: flex; flex-direction: column; line-height: 1.2;">
+              <span class="amt">Bs 184.500</span>
+              <span class="stat">● Validado</span>
+            </div>
+          </div>
+
+          <div class="m-pay">
+            <div class="pip" style="background:#F4B731; color:#3a2410;">BV</div>
+            <div class="meta">
+              <b>Luis Pernía</b>
+              <small>010294810263 · 14:24</small>
+            </div>
+            <div style="text-align:right; display: flex; flex-direction: column; line-height: 1.2;">
+              <span class="amt">Bs 3.250</span>
+              <span class="stat" style="color:#8a601a;">● Revisión</span>
+            </div>
+          </div>
+
+          <div class="m-pay">
+            <div class="pip" style="background:#D9402A;">BN</div>
+            <div class="meta">
+              <b>Rosa Aguilar</b>
+              <small>013438192740 · 14:18</small>
+            </div>
+            <div style="text-align:right; display: flex; flex-direction: column; line-height: 1.2;">
+              <span class="amt">Bs 8.940</span>
+              <span class="stat">● Validado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- floating tab bar -->
+        <div class="mobile-tab">
+          <div class="t on">
+            <svg width="22" height="22"><use href="#i-tab-home"/></svg>
+            Inicio
+          </div>
+          <div class="t">
+            <svg width="22" height="22"><use href="#i-tab-list"/></svg>
+            Pagos
+          </div>
+          <div class="fab">
+            <svg width="22" height="22" viewBox="0 0 16 16"><use href="#i-plus"/></svg>
+          </div>
+          <div class="t">
+            <svg width="22" height="22"><use href="#i-tab-chart"/></svg>
+            Reportes
+          </div>
+          <div class="t">
+            <svg width="22" height="22"><use href="#i-tab-user"/></svg>
+            Cuenta
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- validation states -->
+    <div>
+      <div style="padding: 4px 4px 12px;">
+        <div class="meta mono" style="font-size:11px; letter-spacing:0.10em; text-transform:uppercase; color:var(--mute);">03 — Estados</div>
+        <div style="font-size: 18px; font-weight: 500; margin-top: 6px; letter-spacing: -0.015em;">
+          Resultados de validación
+        </div>
+      </div>
+      <div class="states-card">
+        <div class="state ok">
+          <div class="ic">
+            <svg width="18" height="18" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+          </div>
+          <div class="meta">
+            <b>Pago validado</b>
+            <span>Coincidencia exacta · Banesco · 2.4&nbsp;s</span>
+          </div>
+          <div class="ref">013482910374</div>
+        </div>
+        <div class="state pend">
+          <div class="ic">
+            <svg width="16" height="16" viewBox="0 0 16 16"><use href="#i-shield-warn"/></svg>
+          </div>
+          <div class="meta">
+            <b>Coincidencia parcial</b>
+            <span>Monto distinto · revisión manual sugerida</span>
+          </div>
+          <div class="ref">010294810263</div>
+        </div>
+        <div class="state fail">
+          <div class="ic">
+            <svg width="16" height="16" viewBox="0 0 16 16"><use href="#i-x"/></svg>
+          </div>
+          <div class="meta">
+            <b>Pago no encontrado</b>
+            <span>No aparece en extracto de Mercantil</span>
+          </div>
+          <div class="ref">010519384720</div>
+        </div>
+
+        <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-2); display: flex; align-items: center; gap: 10px;">
+          <svg class="icon" style="color:var(--mute);"><use href="#i-info"/></svg>
+          <span style="font-size: 11.5px; color: var(--mute); line-height: 1.5;">
+            Cada validación queda registrada con el usuario, banco detectado y huella temporal para el cierre de día.
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

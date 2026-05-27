@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --cream:      #ECE5D6;
+  --cream-2:    #F2ECDD;
+  --cream-3:    #E4DCC8;
+  --paper:      #FBF7EE;
+  --ink:        #18140F;
+  --ink-2:      #2A241E;
+  --mute:       #6A6357;
+  --mute-2:     #9A9285;
+  --line:       rgba(24,20,15,0.09);
+  --line-2:     rgba(24,20,15,0.05);
+  --ember-1:    #D9402A;
+  --ember-2:    #E97A1F;
+  --ember-3:    #F4B731;
+  --ember-gradient: linear-gradient(135deg,#D9402A 0%, #E97A1F 52%, #F4B731 100%);
+  --ember-soft: linear-gradient(135deg,rgba(217,64,42,0.16) 0%, rgba(233,122,31,0.14) 50%, rgba(244,183,49,0.12) 100%);
+  --graphite-0: #0F0D0B;
+  --graphite-1: #15120F;
+  --graphite-2: #1C1814;
+  --graphite-3: #25201B;
+  --graphite-4: #322B25;
+  --good:       #4F9D6B;
+  --warn:       #E0A02C;
+  --bad:        #C8453A;
+  --radius-sm:  10px;
+  --radius:     16px;
+  --radius-lg:  22px;
+  --radius-xl:  28px;
+  --shadow-sm:  0 1px 0 rgba(24,20,15,0.04), 0 1px 2px rgba(24,20,15,0.04);
+  --shadow:     0 1px 0 rgba(24,20,15,0.04), 0 6px 18px -8px rgba(24,20,15,0.10), 0 24px 48px -24px rgba(24,20,15,0.10);
+  --shadow-lg:  0 1px 0 rgba(24,20,15,0.04), 0 18px 40px -16px rgba(24,20,15,0.18), 0 60px 100px -40px rgba(24,20,15,0.20);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(244,183,49,0.10), transparent 60%),
+    radial-gradient(1100px 700px at 95% 18%, rgba(217,64,42,0.05), transparent 65%),
+    var(--cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-feature-settings: 'ss01','cv11','tnum';
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(233,122,31,0.25);
+}
+
+.num {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes pulse-green {
+  0%   { box-shadow: 0 0 0 0   rgba(79,157,107,0.55); }
+  70%  { box-shadow: 0 0 0 5px rgba(79,157,107,0); }
+  100% { box-shadow: 0 0 0 0   rgba(79,157,107,0); }
+}
+.dot-pulse-green {
+  animation: pulse-green 2s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+
+@keyframes pulse-orange {
+  0%   { box-shadow: 0 0 0 0   rgba(233,122,31,0.55); }
+  70%  { box-shadow: 0 0 0 5px rgba(233,122,31,0); }
+  100% { box-shadow: 0 0 0 0   rgba(233,122,31,0); }
+}
+.dot-pulse-orange {
+  animation: pulse-orange 2s cubic-bezier(0.4,0,0.6,1) infinite;
+}
