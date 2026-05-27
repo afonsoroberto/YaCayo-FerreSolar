@@ -246,7 +246,7 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
         )}
 
         {/* Breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#6A6357', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6A6357', overflow: 'hidden', minWidth: 0, flexShrink: 1, maxWidth: onMenuClick ? 140 : 'none', whiteSpace: 'nowrap' }}>
           {isHome ? (
             <b style={{ color: '#18140F', fontWeight: 500 }}>Inicio</b>
           ) : (
@@ -264,7 +264,7 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
         </div>
 
         {/* Search */}
-        <div ref={wrapRef} style={{ marginLeft: onMenuClick ? 0 : 16, flex: 1, maxWidth: onMenuClick ? '100%' : 420, position: 'relative' }}>
+        <div ref={wrapRef} style={{ flex: 1, minWidth: 0, maxWidth: onMenuClick ? '100%' : 420, position: 'relative', marginLeft: onMenuClick ? 0 : 16 }}>
           <div style={{
             height: 36, borderRadius: 10,
             background: showDropdown ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.55)',
