@@ -283,7 +283,7 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
               value={query}
               onChange={e => { setQuery(e.target.value); setShowDropdown(true) }}
               onFocus={() => setShowDropdown(true)}
-              placeholder="Buscar por referencia, monto, cédula o teléfono…"
+              placeholder={onMenuClick ? "Buscar pago móvil…" : "Buscar por referencia, monto, cédula o teléfono…"}
               style={{
                 flex: 1, border: 'none', outline: 'none', background: 'transparent',
                 fontSize: 13, color: '#18140F',
