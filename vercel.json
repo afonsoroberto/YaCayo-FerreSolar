@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/bdv/getMovement", "destination": "/api/bdv" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
