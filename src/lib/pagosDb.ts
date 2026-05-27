@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { getBankByCode } from '../config/banks'
+import { getBankByCode, getBankConfigs } from '../config/banks'
 import type { ValidationResult } from '../types'
 import type { Payment } from '../types'
 
@@ -134,4 +134,42 @@ export async function fetchVolumeData() {
       prevAmount: 0,
     }
   })
+}
+
+// ─── Distribución por banco desde Supabase ────────────────────────────────────
+
+export async function fetchBankDistribution() {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const { data, error } = await supabase
+    .from('pagos')
+    .select('banco_codigo, banco_nombre, monto')
+    .gte('created_at', today.toISOString())
+    .eq('estado', 'validado')
+
+  if (error || !data || data.length === 0) return []
+
+  // Agrupar por banco
+  const grouped: Record<string, { name: string; count: number }> = {}
+  for (const row of data) {
+    const code = row.banco_codigo
+    if (!grouped[code]) grouped[code] = { name: row.banco_nombre ?? code, count: 0 }
+    grouped[code].count++
+  }
+
+  const total = data.length
+  const banks = getBankConfigs()
+
+  return Object.entries(grouped).map(([code, val]) => {
+    const bank = getBankByCode(code) ?? banks.find(b => b.shortCode === code)
+    return {
+      code: bank?.shortCode ?? code,
+      name: val.name,
+      color: bank?.color ?? '#6A6357',
+      textColor: bank?.textColor,
+      percent: Math.round((val.count / total) * 100),
+      count: val.count,
+    }
+  }).sort((a, b) => b.count - a.count)
 }

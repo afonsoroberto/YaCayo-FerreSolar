@@ -18,8 +18,7 @@ export default function Sidebar({ collapsed = false, onClose }: SidebarProps) {
       width: collapsed ? 64 : 256,
       minWidth: collapsed ? 64 : 256,
       height: '100vh',
-      position: 'sticky',
-      top: 0,
+      position: 'relative',
       background: 'linear-gradient(180deg, #1C1814 0%, #15120F 100%)',
       color: '#E9E3D5',
       padding: collapsed ? '22px 8px 18px' : '22px 16px 18px',
@@ -79,7 +78,7 @@ export default function Sidebar({ collapsed = false, onClose }: SidebarProps) {
           boxShadow: '0 1px 0 rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.06)',
           flexShrink: 0, overflow: 'hidden',
         }}>
-          <img src="/src/assets/ferre-solar.jpeg" alt="FerreSolar"
+          <img src="/src/assets/ferresolar-logo.png" alt="FerreSolar"
             style={{ width: 32, height: 32, objectFit: 'contain' }}
             onError={e => {
               e.currentTarget.style.display = 'none'

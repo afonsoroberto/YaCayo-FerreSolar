@@ -4,7 +4,7 @@ import { useNewPayments } from '../context/NewPaymentsContext'
 import { useStats } from '../hooks/useStats'
 import { usePayments } from '../hooks/usePayments'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { fetchVolumeData } from '../lib/pagosDb'
+import { fetchVolumeData, fetchBankDistribution } from '../lib/pagosDb'
 import StatCard from '../components/dashboard/StatCard'
 import VolumeChart from '../components/dashboard/VolumeChart'
 import BankDistribution from '../components/dashboard/BankDistribution'
@@ -12,8 +12,7 @@ import RecentPayments from '../components/dashboard/RecentPayments'
 import ValidationForm from '../components/dashboard/ValidationForm'
 import ValidationResult from '../components/dashboard/ValidationResult'
 import { IconPlus } from '../components/icons/Icons'
-import { bankDistribution } from '../lib/data'
-import type { ValidationResult as VResult, VolumeDataPoint } from '../types'
+import type { ValidationResult as VResult, VolumeDataPoint, BankDistributionItem } from '../types'
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -23,15 +22,18 @@ export default function Dashboard() {
   const isMobile = useIsMobile()
   const [validationResult, setValidationResult] = useState<VResult | null>(null)
   const [volumeData, setVolumeData] = useState<VolumeDataPoint[]>([])
+  const [bankDist, setBankDist] = useState<BankDistributionItem[]>([])
 
   useEffect(() => {
     fetchVolumeData().then(setVolumeData).catch(console.error)
+    fetchBankDistribution().then(setBankDist).catch(console.error)
   }, [])
 
   const handleValidationSuccess = useCallback((result: VResult) => {
     setValidationResult(result)
     increment()
     refetch()
+    fetchBankDistribution().then(setBankDist).catch(console.error)
   }, [increment, refetch])
 
   const sparkTotal    = [22, 18, 20, 14, 16, 10, 12, 6, 8, 4]
@@ -108,7 +110,7 @@ export default function Dashboard() {
       {/* Charts row — stacked en mobile */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.6fr 1fr', gap: isMobile ? 14 : 16 }}>
         <VolumeChart data={volumeData} />
-        <BankDistribution data={bankDistribution} />
+        <BankDistribution data={bankDist} />
       </div>
 
       {/* Recent payments + validation — stacked en mobile */}

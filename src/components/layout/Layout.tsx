@@ -45,6 +45,8 @@ export default function Layout() {
           position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 50,
           transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 0.25s ease',
+          height: '100%',
+          display: 'flex',
         }}>
           <Sidebar onClose={() => setSidebarOpen(false)} />
         </div>
