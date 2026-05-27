@@ -245,26 +245,28 @@ export default function Topbar({ pageTitle = 'Resumen del día', onMenuClick }: 
           </button>
         )}
 
-        {/* Breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6A6357', overflow: 'hidden', minWidth: 0, flexShrink: 1, maxWidth: onMenuClick ? 140 : 'none', whiteSpace: 'nowrap' }}>
-          {isHome ? (
-            <b style={{ color: '#18140F', fontWeight: 500 }}>Inicio</b>
-          ) : (
-            <>
-              <Link
-                to="/dashboard"
-                style={linkStyle}
-                onMouseEnter={e => (e.currentTarget.style.color = '#18140F')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#6A6357')}
-              >Inicio</Link>
-              <span style={{ color: '#9A9285' }}>›</span>
-              <b style={{ color: '#18140F', fontWeight: 500 }}>{pageTitle}</b>
-            </>
-          )}
-        </div>
+        {/* Breadcrumb — solo desktop */}
+        {!onMenuClick && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6A6357', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {isHome ? (
+              <b style={{ color: '#18140F', fontWeight: 500 }}>Inicio</b>
+            ) : (
+              <>
+                <Link
+                  to="/dashboard"
+                  style={linkStyle}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#18140F')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#6A6357')}
+                >Inicio</Link>
+                <span style={{ color: '#9A9285' }}>›</span>
+                <b style={{ color: '#18140F', fontWeight: 500 }}>{pageTitle}</b>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Search */}
-        <div ref={wrapRef} style={{ flex: 1, minWidth: 0, maxWidth: onMenuClick ? '100%' : 420, position: 'relative', marginLeft: onMenuClick ? 0 : 16 }}>
+        <div ref={wrapRef} style={{ flex: 1, minWidth: 0, maxWidth: onMenuClick ? '100%' : 420, position: 'relative' }}>
           <div style={{
             height: 36, borderRadius: 10,
             background: showDropdown ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.55)',
